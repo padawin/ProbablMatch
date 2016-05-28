@@ -139,10 +139,20 @@ class ProbablTest extends Component {
 				{match['homeTeam']['score']}-{match['awayTeam']['score']}
 			</Text>;
 		}
+		else {
+			matchMisc = <Text>Upcoming match</Text>
+		}
 
 		return (
-			<View>
-				<Text>{match['@date']}</Text>
+			<View style={styles.paddedContent}>
+				<View style={styles.container}>
+					<View style={styles.half}>
+						<Text>{match['@date']}</Text>
+					</View>
+					<View style={styles.half}>
+						{matchMisc}
+					</View>
+				</View>
 				<View style={styles.container}>
 					<View style={styles.third}>
 						<Text>{match['homeTeam']['teamName']}</Text>
