@@ -69,14 +69,17 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
+		var results, date;
+
+		date = this.state.date.toDateString();
 		if (this.state.empty) {
 			results = <View>
-				<Text>No match found</Text>
+				<Text>No match found on the {date}</Text>
 			</View>;
 		}
 		else {
 			results = <View>
-				<View><Text>Matches found</Text></View>
+				<View><Text>Matches found for the {date}</Text></View>
 				<ListView
 					dataSource={this.state.dataSource}
 					renderRow={this.renderMatch}
