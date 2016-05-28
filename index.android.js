@@ -9,6 +9,8 @@ import {
 	StyleSheet,
 	ListView,
 	Text,
+	DatePickerAndroid,
+	TouchableWithoutFeedback,
 	View
 } from 'react-native';
 
@@ -22,30 +24,60 @@ class ProbablTest extends Component {
 			dataSource: new ListView.DataSource({
 				rowHasChanged: (row1, row2) => row1 !== row2
 			}),
-			loaded: false
+			loaded: false,
+			date: new Date()
 		};
 	}
 
 	componentDidMount() {
-		this.fetchData();
+		this.fetchData(this.formatDate());
 	}
 
-	fetchData() {
+	formatDate() {
+		var year, month, day;
+
+		year = this.state.date.getFullYear();
+		month = this.state.date.getMonth();
+		day = this.state.date.getDate();
+		month = (month < 10 ? '0' : '') + (month + 1);
+		day = (day < 10 ? '0' : '') + day;
+
+		return '' + year + month + day;
+	}
+
+	fetchData(date) {
 		var url = REQUEST_URL
 			.replace('{{API_KEY}}', 'MYSECRETAPIKEY')
-			.replace('{{DATE}}', '20160508');
+			.replace('{{DATE}}', date);
 
 		fetch(url)
 			.then((response) => response.json())
 			.then((responseData) => {
+				var matches = responseData.matches.match || [];
 				this.setState({
 					dataSource: this.state.dataSource.cloneWithRows(
-						responseData.matches.match
+						matches
 					),
-					loaded: true
+					loaded: true,
+					empty: matches.length == [],
+					date: this.state.date
 				});
 			})
 			.done();
+	}
+
+	async showPicker() {
+		try {
+			const {action, year, month, day} = await DatePickerAndroid.open({
+				date: new Date()
+			});
+			if (action !== DatePickerAndroid.dismissedAction) {
+				this.state.date = new Date(year, month, day);
+				this.fetchData(this.formatDate());
+			}
+		} catch ({code, message}) {
+			console.warn('Cannot open date picker', message);
+		}
 	}
 
 	render() {
@@ -53,12 +85,40 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
+		var results, date;
+
+		date = this.state.date.toDateString();
+		if (this.state.empty) {
+			results = <View style={styles.paddedContent}>
+				<Text>No match found on the {date}</Text>
+			</View>;
+		}
+		else {
+			results = <View>
+				<View style={styles.paddedContent}>
+					<Text>Matches found for the {date}</Text>
+				</View>
+				<ListView
+					dataSource={this.state.dataSource}
+					renderRow={this.renderMatch}
+					style={styles.listView}
+				/>
+			</View>;
+		}
+
 		return (
-			<ListView
-				dataSource={this.state.dataSource}
-				renderRow={this.renderMatch}
-				style={styles.listView}
-			/>
+			<View>
+				<View style={styles.paddedContent}>
+					<TouchableWithoutFeedback
+						onPress={this.showPicker.bind(this)}
+					>
+						<View>
+							<Text>Click to pick a date</Text>
+						</View>
+					</TouchableWithoutFeedback>
+				</View>
+				{results}
+			</View>
 		);
 	}
 
@@ -109,6 +169,9 @@ const styles = StyleSheet.create({
 	listView: {
 		paddingTop: 20,
 		backgroundColor: '#F5FCFF'
+	},
+	paddedContent: {
+		padding: 7
 	}
 });
 
