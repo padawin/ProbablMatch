@@ -28,13 +28,25 @@ class ProbablTest extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData();
+		this.fetchData(this.formatDate());
 	}
 
-	fetchData() {
+	formatDate() {
+		var year, month, day;
+
+		year = this.state.date.getFullYear();
+		month = this.state.date.getMonth();
+		day = this.state.date.getDate();
+		month = (month < 10 ? '0' : '') + (month + 1);
+		day = (day < 10 ? '0' : '') + day;
+
+		return '' + year + month + day;
+	}
+
+	fetchData(date) {
 		var url = REQUEST_URL
 			.replace('{{API_KEY}}', 'MYSECRETAPIKEY')
-			.replace('{{DATE}}', '20160508');
+			.replace('{{DATE}}', date);
 
 		fetch(url)
 			.then((response) => response.json())
