@@ -85,18 +85,19 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
-		var results, date;
+		var results, date, nbMatches;
 
 		date = this.state.date.toDateString();
 		if (this.state.empty) {
 			results = <View style={styles.paddedContent}>
-				<Text>No match found on the {date}</Text>
+				<Text>No match found</Text>
 			</View>;
 		}
 		else {
+			nbMatches = this.state.dataSource._dataBlob.s1.length;
 			results = <View>
-				<View style={styles.paddedContent}>
-					<Text>Matches found for the {date}</Text>
+				<View style={[styles.paddedContent, styles.center]}>
+					<Text>{nbMatches} matches found</Text>
 				</View>
 				<ListView
 					dataSource={this.state.dataSource}
@@ -113,7 +114,7 @@ class ProbablTest extends Component {
 						onPress={this.showPicker.bind(this)}
 					>
 						<View>
-							<Text>Click to pick a date</Text>
+							<Text>{date}</Text>
 						</View>
 					</TouchableWithoutFeedback>
 				</View>
@@ -191,6 +192,9 @@ const styles = StyleSheet.create({
 	},
 	year: {
 		textAlign: 'center'
+	},
+	center: {
+		alignItems: 'center'
 	},
 	listView: {
 		paddingTop: 20,
