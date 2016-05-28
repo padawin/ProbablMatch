@@ -184,6 +184,9 @@ const styles = StyleSheet.create({
 	},
 	third: {
 		flex: .333
+	},
+	half: {
+		flex: .5
 	}
 });
 
