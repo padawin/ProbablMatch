@@ -9,6 +9,8 @@ import {
 	StyleSheet,
 	ListView,
 	Text,
+	DatePickerAndroid,
+	TouchableWithoutFeedback,
 	View
 } from 'react-native';
 
@@ -64,6 +66,20 @@ class ProbablTest extends Component {
 			.done();
 	}
 
+	async showPicker() {
+		try {
+			const {action, year, month, day} = await DatePickerAndroid.open({
+				date: new Date()
+			});
+			if (action !== DatePickerAndroid.dismissedAction) {
+				this.state.date = new Date(year, month, day);
+				this.fetchData(this.formatDate());
+			}
+		} catch ({code, message}) {
+			console.warn('Cannot open date picker', message);
+		}
+	}
+
 	render() {
 		if (!this.state.loaded) {
 			return this.renderLoadingView();
@@ -90,6 +106,15 @@ class ProbablTest extends Component {
 
 		return (
 			<View>
+				<View style={styles.pickDateButton}>
+					<TouchableWithoutFeedback
+						onPress={this.showPicker.bind(this)}
+					>
+						<View>
+							<Text>Click to pick a date</Text>
+						</View>
+					</TouchableWithoutFeedback>
+				</View>
 				{results}
 			</View>
 		);
@@ -142,6 +167,9 @@ const styles = StyleSheet.create({
 	listView: {
 		paddingTop: 20,
 		backgroundColor: '#F5FCFF'
+	},
+	pickDateButton: {
+		padding: 7
 	}
 });
 
