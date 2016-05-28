@@ -39,11 +39,13 @@ class ProbablTest extends Component {
 		fetch(url)
 			.then((response) => response.json())
 			.then((responseData) => {
+				var matches = responseData.matches.match || [];
 				this.setState({
 					dataSource: this.state.dataSource.cloneWithRows(
-						responseData.matches.match
+						matches
 					),
 					loaded: true,
+					empty: matches.length == [],
 					date: this.state.date
 				});
 			})
@@ -55,12 +57,26 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
+		if (this.state.empty) {
+			results = <View>
+				<Text>No match found</Text>
+			</View>;
+		}
+		else {
+			results = <View>
+				<View><Text>Matches found</Text></View>
+				<ListView
+					dataSource={this.state.dataSource}
+					renderRow={this.renderMatch}
+					style={styles.listView}
+				/>
+			</View>;
+		}
+
 		return (
-			<ListView
-				dataSource={this.state.dataSource}
-				renderRow={this.renderMatch}
-				style={styles.listView}
-			/>
+			<View>
+				{results}
+			</View>
 		);
 	}
 
