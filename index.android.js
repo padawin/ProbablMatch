@@ -22,7 +22,8 @@ class ProbablTest extends Component {
 			dataSource: new ListView.DataSource({
 				rowHasChanged: (row1, row2) => row1 !== row2
 			}),
-			loaded: false
+			loaded: false,
+			date: new Date()
 		};
 	}
 
@@ -42,7 +43,8 @@ class ProbablTest extends Component {
 					dataSource: this.state.dataSource.cloneWithRows(
 						responseData.matches.match
 					),
-					loaded: true
+					loaded: true,
+					date: this.state.date
 				});
 			})
 			.done();
