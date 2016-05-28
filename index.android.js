@@ -89,13 +89,15 @@ class ProbablTest extends Component {
 
 		date = this.state.date.toDateString();
 		if (this.state.empty) {
-			results = <View>
+			results = <View style={styles.paddedContent}>
 				<Text>No match found on the {date}</Text>
 			</View>;
 		}
 		else {
 			results = <View>
-				<View><Text>Matches found for the {date}</Text></View>
+				<View style={styles.paddedContent}>
+					<Text>Matches found for the {date}</Text>
+				</View>
 				<ListView
 					dataSource={this.state.dataSource}
 					renderRow={this.renderMatch}
@@ -106,7 +108,7 @@ class ProbablTest extends Component {
 
 		return (
 			<View>
-				<View style={styles.pickDateButton}>
+				<View style={styles.paddedContent}>
 					<TouchableWithoutFeedback
 						onPress={this.showPicker.bind(this)}
 					>
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
 		paddingTop: 20,
 		backgroundColor: '#F5FCFF'
 	},
-	pickDateButton: {
+	paddedContent: {
 		padding: 7
 	}
 });
