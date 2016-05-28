@@ -134,9 +134,18 @@ class ProbablTest extends Component {
 
 	renderMatch(match) {
 		return (
-			<View style={styles.container}>
-				<View style={styles.rightContainer}>
-					<Text style={styles.title}>{match['@matchID']}</Text>
+			<View>
+				<Text>{match['@date']}</Text>
+				<View style={styles.container}>
+					<View style={styles.third}>
+						<Text>{match['homeTeam']['teamName']}</Text>
+					</View>
+					<View style={styles.third}>
+						<Text>{match['homeTeam']['score']}-{match['awayTeam']['score']}</Text>
+					</View>
+					<View style={styles.third}>
+						<Text>{match['awayTeam']['teamName']}</Text>
+					</View>
 				</View>
 			</View>
 		);
@@ -172,6 +181,9 @@ const styles = StyleSheet.create({
 	},
 	paddedContent: {
 		padding: 7
+	},
+	third: {
+		flex: .333
 	}
 });
 
