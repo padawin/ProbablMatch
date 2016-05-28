@@ -85,18 +85,19 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
-		var results, date;
+		var results, date, nbMatches;
 
 		date = this.state.date.toDateString();
 		if (this.state.empty) {
 			results = <View style={styles.paddedContent}>
-				<Text>No match found on the {date}</Text>
+				<Text>No match found</Text>
 			</View>;
 		}
 		else {
+			nbMatches = this.state.dataSource._dataBlob.s1.length;
 			results = <View>
-				<View style={styles.paddedContent}>
-					<Text>Matches found for the {date}</Text>
+				<View style={[styles.paddedContent, styles.center]}>
+					<Text>{nbMatches} matches found</Text>
 				</View>
 				<ListView
 					dataSource={this.state.dataSource}
@@ -113,7 +114,7 @@ class ProbablTest extends Component {
 						onPress={this.showPicker.bind(this)}
 					>
 						<View>
-							<Text>Click to pick a date</Text>
+							<Text>{date}</Text>
 						</View>
 					</TouchableWithoutFeedback>
 				</View>
@@ -133,10 +134,36 @@ class ProbablTest extends Component {
 	}
 
 	renderMatch(match) {
+		var matchResult, matchMisc;
+		if (match['matchStatus'] === 'FT' || match['matchStatus'] === 'KO') {
+			matchResult = <Text>
+				{match['homeTeam']['score']}-{match['awayTeam']['score']}
+			</Text>;
+		}
+		else {
+			matchMisc = <Text>Upcoming match</Text>
+		}
+
 		return (
-			<View style={styles.container}>
-				<View style={styles.rightContainer}>
-					<Text style={styles.title}>{match['@matchID']}</Text>
+			<View style={styles.paddedContent}>
+				<View style={styles.container}>
+					<View style={styles.half}>
+						<Text>{match['@date']}</Text>
+					</View>
+					<View style={styles.half}>
+						{matchMisc}
+					</View>
+				</View>
+				<View style={styles.container}>
+					<View style={styles.third}>
+						<Text>{match['homeTeam']['teamName']}</Text>
+					</View>
+					<View style={styles.third}>
+						{matchResult}
+					</View>
+					<View style={styles.third}>
+						<Text>{match['awayTeam']['teamName']}</Text>
+					</View>
 				</View>
 			</View>
 		);
@@ -151,20 +178,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: '#F5FCFF'
 	},
-	rightContainer: {
-		flex: 1
-	},
-	thumbnail: {
-		width: 53,
-		height: 81
-	},
-	title: {
-		fontSize: 20,
-		marginBottom: 8,
-		textAlign: 'center'
-	},
-	year: {
-		textAlign: 'center'
+	center: {
+		alignItems: 'center'
 	},
 	listView: {
 		paddingTop: 20,
@@ -172,6 +187,12 @@ const styles = StyleSheet.create({
 	},
 	paddedContent: {
 		padding: 7
+	},
+	third: {
+		flex: .333
+	},
+	half: {
+		flex: .5
 	}
 });
 
