@@ -94,11 +94,12 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
-		var results, date, nbMatches;
+		var results, date, nbMatches,
+			text = 'matches found';;
 
 		date = this.state.date.toDateString();
 		if (this.state.empty) {
-			results = <View style={styles.paddedContent}>
+			results = <View style={styles.container}>
 				<Text>No match found</Text>
 			</View>;
 		}
@@ -106,11 +107,12 @@ class ProbablTest extends Component {
 			nbMatches = this.state.dataSource._dataBlob.s1.length;
 			if (nbMatches === undefined) {
 				nbMatches = 1;
+				text = 'match found';
 			}
 
 			results = <View>
 				<View style={[styles.paddedContent, styles.center]}>
-					<Text>{nbMatches} matches found</Text>
+					<Text>{nbMatches} {text}</Text>
 				</View>
 				<ListView
 					dataSource={this.state.dataSource}
