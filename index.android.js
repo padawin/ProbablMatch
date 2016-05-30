@@ -154,12 +154,27 @@ class ProbablTest extends Component {
 		</View>);
 	};
 
+	getWinnerLoser(matchFinished, homeTeam, awayTeam) {
+		if (!matchFinished || homeTeam.score === awayTeam.score) {
+			return {homeTeam: null, awayTeam: null};
+		}
+		else if (homeTeam.score > awayTeam.score) {
+			return {homeTeam: styles.winner, awayTeam: styles.loser};
+		}
+		else if (homeTeam.score < awayTeam.score) {
+			return {homeTeam: styles.loser, awayTeam: styles.winner};
+		}
+	}
+
 	renderMatch(match) {
-		var matchResult, matchMisc, matchDate;
+		var matchResult, matchMisc, matchDate,
+			matchFinished = false, resultTeams;
 		if (match['matchStatus'] === 'FT' || match['matchStatus'] === 'KO') {
 			matchResult = <Text>
 				{match['homeTeam']['score']}-{match['awayTeam']['score']}
 			</Text>;
+
+			matchFinished = (match['matchStatus'] === 'FT');
 		}
 		else {
 			matchMisc = <Text>Upcoming match</Text>
@@ -171,6 +186,13 @@ class ProbablTest extends Component {
 			parseInt(matchDate[1]) - 1,
 			matchDate[0]
 		);
+
+		resultTeams = this.getWinnerLoser(
+			matchFinished,
+			match['homeTeam'],
+			match['awayTeam']
+		);
+
 		return (
 			<View style={styles.paddedContent}>
 				<View style={styles.container}>
@@ -183,13 +205,13 @@ class ProbablTest extends Component {
 				</View>
 				<View style={styles.container}>
 					<View style={styles.third}>
-						<Text>{match['homeTeam']['teamName']}</Text>
+						<Text style={resultTeams.homeTeam}>{match['homeTeam']['teamName']}</Text>
 					</View>
 					<View style={[styles.third, styles.center]}>
 						{matchResult}
 					</View>
 					<View style={styles.third}>
-						<Text>{match['awayTeam']['teamName']}</Text>
+						<Text style={resultTeams.awayTeam}>{match['awayTeam']['teamName']}</Text>
 					</View>
 				</View>
 			</View>
@@ -221,6 +243,12 @@ const styles = StyleSheet.create({
 	},
 	half: {
 		flex: .5
+	},
+	winner: {
+		color: 'green'
+	},
+	loser: {
+		color: 'red'
 	}
 });
 
