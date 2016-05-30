@@ -95,7 +95,7 @@ class ProbablTest extends Component {
 		}
 
 		var results, date, nbMatches,
-			text = 'matches found';;
+			text = 'matches found';
 
 		date = this.state.date.toDateString();
 		if (this.state.empty) {
