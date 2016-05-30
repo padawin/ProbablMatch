@@ -62,7 +62,7 @@ class ProbablTest extends Component {
 						matches
 					),
 					loaded: true,
-					empty: matches.length == [],
+					empty: matches.length === 0,
 					date: this.state.date
 				});
 			})
