@@ -54,6 +54,9 @@ class ProbablTest extends Component {
 			.then((response) => response.json())
 			.then((responseData) => {
 				var matches = responseData.matches.match || [];
+				if (matches.length === undefined) {
+					matches = responseData.matches;
+				}
 				this.setState({
 					dataSource: this.state.dataSource.cloneWithRows(
 						matches
@@ -95,6 +98,10 @@ class ProbablTest extends Component {
 		}
 		else {
 			nbMatches = this.state.dataSource._dataBlob.s1.length;
+			if (nbMatches === undefined) {
+				nbMatches = 1;
+			}
+
 			results = <View>
 				<View style={[styles.paddedContent, styles.center]}>
 					<Text>{nbMatches} matches found</Text>
