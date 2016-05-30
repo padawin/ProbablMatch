@@ -6,7 +6,6 @@
 import React, { Component } from 'react';
 import {
 	AppRegistry,
-	StyleSheet,
 	ListView,
 	Text,
 	DatePickerAndroid,
@@ -14,6 +13,7 @@ import {
 	View
 } from 'react-native';
 
+var styles = require('./styles.js');
 
 var REQUEST_URL = 'http://pads6.pa-sport.com/api/football/competitions/matchDay/{{API_KEY}}/{{DATE}}/json';
 
@@ -234,38 +234,5 @@ class ProbablTest extends Component {
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#F5FCFF'
-	},
-	center: {
-		alignItems: 'center',
-		justifyContent: 'center'
-	},
-	listView: {
-		paddingTop: 20,
-		backgroundColor: '#F5FCFF'
-	},
-	paddedContent: {
-		padding: 7
-	},
-	third: {
-		flex: .333
-	},
-	half: {
-		flex: .5
-	},
-	winner: {
-		color: 'green'
-	},
-	loser: {
-		color: 'red'
-	}
-});
 
 AppRegistry.registerComponent('ProbablTest', () => ProbablTest);
