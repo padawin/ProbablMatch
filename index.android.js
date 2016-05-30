@@ -179,7 +179,7 @@ class ProbablTest extends Component {
 					<View style={styles.third}>
 						<Text>{match['homeTeam']['teamName']}</Text>
 					</View>
-					<View style={styles.third}>
+					<View style={[styles.third, styles.center]}>
 						{matchResult}
 					</View>
 					<View style={styles.third}>
@@ -200,7 +200,8 @@ const styles = StyleSheet.create({
 		backgroundColor: '#F5FCFF'
 	},
 	center: {
-		alignItems: 'center'
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
 	listView: {
 		paddingTop: 20,
