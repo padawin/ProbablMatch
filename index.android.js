@@ -66,6 +66,9 @@ class ProbablTest extends Component {
 					date: this.state.date
 				});
 			})
+			.catch((error) => {
+				this.setState({'error': error.message});
+			})
 			.done();
 	}
 
@@ -84,7 +87,10 @@ class ProbablTest extends Component {
 	}
 
 	render() {
-		if (!this.state.loaded) {
+		if (this.state.error) {
+			return this.renderError(this.state.error);
+		}
+		else if (!this.state.loaded) {
 			return this.renderLoadingView();
 		}
 
@@ -139,6 +145,12 @@ class ProbablTest extends Component {
 			</View>
 		);
 	}
+
+	renderError(error) {
+		return (<View style={styles.container}>
+			<Text>{error}</Text>
+		</View>);
+	};
 
 	renderMatch(match) {
 		var matchResult, matchMisc;
