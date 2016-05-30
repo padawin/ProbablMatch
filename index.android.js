@@ -94,14 +94,11 @@ class ProbablTest extends Component {
 			return this.renderLoadingView();
 		}
 
-		var results, date, nbMatches,
+		var results, nbMatches,
 			text = 'matches found';
 
-		date = this.state.date.toDateString();
 		if (this.state.empty) {
-			results = <View style={styles.container}>
-				<Text>No match found</Text>
-			</View>;
+			results = this.getNoMatchView();
 		}
 		else {
 			nbMatches = this.state.dataSource._dataBlob.s1.length;
@@ -110,18 +107,33 @@ class ProbablTest extends Component {
 				text = 'match found';
 			}
 
-			results = <View>
-				<View style={[styles.paddedContent, styles.center]}>
-					<Text>{nbMatches} {text}</Text>
-				</View>
-				<ListView
-					dataSource={this.state.dataSource}
-					renderRow={this.renderMatch.bind(this)}
-					style={styles.listView}
-				/>
-			</View>;
+			results = this.getMatchesListView(nbMatches + ' ' + text);
 		}
 
+		return this.getMainView(results);
+	}
+
+	getMatchesListView(headerText) {
+		return (<View>
+			<View style={[styles.paddedContent, styles.center]}>
+				<Text>{headerText}</Text>
+			</View>
+			<ListView
+				dataSource={this.state.dataSource}
+				renderRow={this.renderMatch.bind(this)}
+				style={styles.listView}
+			/>
+		</View>);
+	}
+
+	getNoMatchView() {
+		return (<View style={styles.container}>
+			<Text>No match found</Text>
+		</View>);
+	}
+
+	getMainView(results) {
+		var date = this.state.date.toDateString();
 		return (
 			<View>
 				<View style={styles.paddedContent}>
@@ -166,52 +178,56 @@ class ProbablTest extends Component {
 		}
 	}
 
-	renderMatch(match) {
-		var matchResult, matchMisc, matchDate,
-			matchFinished = false, resultTeams;
-		if (match['matchStatus'] === 'FT' || match['matchStatus'] === 'KO') {
-			matchResult = <Text>
-				{match['homeTeam']['score']}-{match['awayTeam']['score']}
-			</Text>;
-
-			matchFinished = (match['matchStatus'] === 'FT');
-		}
-		else {
-			matchMisc = <Text>Upcoming match</Text>
-		}
-
-		matchDate = match['@date'].split('/');
-		matchDate = new Date(
-			matchDate[2],
-			parseInt(matchDate[1]) - 1,
-			matchDate[0]
+	formatMatch(match) {
+		match.date = match['@date'].split('/');
+		match.date = new Date(
+			match.date[2],
+			parseInt(match.date[1]) - 1,
+			match.date[0]
 		);
-
-		resultTeams = this.getWinnerLoser(
-			matchFinished,
+		match.resultTeams = this.getWinnerLoser(
+			(match['matchStatus'] === 'FT'),
 			match['homeTeam'],
 			match['awayTeam']
 		);
+
+		match.views = {};
+		if (match['matchStatus'] === 'FT'
+			|| match['matchStatus'] === 'KO'
+		) {
+			match.views.result = <Text>
+				{match['homeTeam']['score']}-{match['awayTeam']['score']}
+			</Text>;
+		}
+		else {
+			match.views.misc = <Text>Upcoming match</Text>
+		}
+
+		return match;
+	}
+
+	renderMatch(match) {
+		match = this.formatMatch(match);
 
 		return (
 			<View style={styles.paddedContent}>
 				<View style={styles.container}>
 					<View style={styles.half}>
-						<Text>{matchDate.toDateString()}</Text>
+						<Text>{match.date.toDateString()}</Text>
 					</View>
 					<View style={styles.half}>
-						{matchMisc}
+						{match.views.misc}
 					</View>
 				</View>
 				<View style={styles.container}>
 					<View style={styles.third}>
-						<Text style={resultTeams.homeTeam}>{match['homeTeam']['teamName']}</Text>
+						<Text style={match.resultTeams.homeTeam}>{match['homeTeam']['teamName']}</Text>
 					</View>
 					<View style={[styles.third, styles.center]}>
-						{matchResult}
+						{match.views.result}
 					</View>
 					<View style={styles.third}>
-						<Text style={resultTeams.awayTeam}>{match['awayTeam']['teamName']}</Text>
+						<Text style={match.resultTeams.awayTeam}>{match['awayTeam']['teamName']}</Text>
 					</View>
 				</View>
 			</View>
