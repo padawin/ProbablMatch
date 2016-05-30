@@ -15,6 +15,17 @@ import {
 
 var styles = require('./styles.js');
 
+//views
+var views = {
+	match: require('./views/match.view.js'),
+	matchList: require('./views/matchList.view.js'),
+	noMatch: require('./views/noMatch.view.js'),
+	matchScore: require('./views/matchScore.view.js'),
+	loading: require('./views/loading.view.js'),
+	main: require('./views/main.view.js'),
+	error: require('./views/error.view.js')
+};
+
 var REQUEST_URL = 'http://pads6.pa-sport.com/api/football/competitions/matchDay/{{API_KEY}}/{{DATE}}/json';
 
 class ProbablTest extends Component {
@@ -88,17 +99,17 @@ class ProbablTest extends Component {
 
 	render() {
 		if (this.state.error) {
-			return this.renderError(this.state.error);
+			return views.error(this.state.error);
 		}
 		else if (!this.state.loaded) {
-			return this.renderLoadingView();
+			return views.loading();
 		}
 
-		var results, nbMatches,
+		var results, nbMatches, date,
 			text = 'matches found';
 
 		if (this.state.empty) {
-			results = this.getNoMatchView();
+			results = views.noMatch();
 		}
 		else {
 			nbMatches = this.state.dataSource._dataBlob.s1.length;
@@ -107,64 +118,19 @@ class ProbablTest extends Component {
 				text = 'match found';
 			}
 
-			results = this.getMatchesListView(nbMatches + ' ' + text);
+			results = views.matchList(
+				nbMatches + ' ' + text,
+				this.state.dataSource,
+				this.renderMatch.bind(this)
+			);
 		}
 
-		return this.getMainView(results);
-	}
-
-	getMatchesListView(headerText) {
-		return (<View>
-			<View style={[styles.paddedContent, styles.center]}>
-				<Text>{headerText}</Text>
-			</View>
-			<ListView
-				dataSource={this.state.dataSource}
-				renderRow={this.renderMatch.bind(this)}
-				style={styles.listView}
-			/>
-		</View>);
-	}
-
-	getNoMatchView() {
-		return (<View style={styles.container}>
-			<Text>No match found</Text>
-		</View>);
-	}
-
-	getMainView(results) {
-		var date = this.state.date.toDateString();
-		return (
-			<View>
-				<View style={styles.paddedContent}>
-					<TouchableWithoutFeedback
-						onPress={this.showPicker.bind(this)}
-					>
-						<View>
-							<Text>{date}</Text>
-						</View>
-					</TouchableWithoutFeedback>
-				</View>
-				{results}
-			</View>
+		return views.main(
+			this.state.date.toDateString(),
+			this.showPicker.bind(this),
+			results
 		);
 	}
-
-	renderLoadingView() {
-		return (
-			<View style={styles.container}>
-				<Text>
-					Loading matches...
-				</Text>
-			</View>
-		);
-	}
-
-	renderError(error) {
-		return (<View style={styles.container}>
-			<Text>{error}</Text>
-		</View>);
-	};
 
 	getWinnerLoser(matchFinished, homeTeam, awayTeam) {
 		if (!matchFinished || homeTeam.score === awayTeam.score) {
@@ -195,12 +161,10 @@ class ProbablTest extends Component {
 		if (match['matchStatus'] === 'FT'
 			|| match['matchStatus'] === 'KO'
 		) {
-			match.views.result = <Text>
-				{match['homeTeam']['score']}-{match['awayTeam']['score']}
-			</Text>;
+			match.views.result = views.matchScore(match);
 		}
 		else {
-			match.views.misc = <Text>Upcoming match</Text>
+			match.views.misc = 'Upcoming match';
 		}
 
 		return match;
@@ -208,30 +172,7 @@ class ProbablTest extends Component {
 
 	renderMatch(match) {
 		match = this.formatMatch(match);
-
-		return (
-			<View style={styles.paddedContent}>
-				<View style={styles.container}>
-					<View style={styles.half}>
-						<Text>{match.date.toDateString()}</Text>
-					</View>
-					<View style={styles.half}>
-						{match.views.misc}
-					</View>
-				</View>
-				<View style={styles.container}>
-					<View style={styles.third}>
-						<Text style={match.resultTeams.homeTeam}>{match['homeTeam']['teamName']}</Text>
-					</View>
-					<View style={[styles.third, styles.center]}>
-						{match.views.result}
-					</View>
-					<View style={styles.third}>
-						<Text style={match.resultTeams.awayTeam}>{match['awayTeam']['teamName']}</Text>
-					</View>
-				</View>
-			</View>
-		);
+		return views.match(match);
 	}
 }
 
