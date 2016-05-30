@@ -155,7 +155,7 @@ class ProbablTest extends Component {
 	};
 
 	renderMatch(match) {
-		var matchResult, matchMisc;
+		var matchResult, matchMisc, matchDate;
 		if (match['matchStatus'] === 'FT' || match['matchStatus'] === 'KO') {
 			matchResult = <Text>
 				{match['homeTeam']['score']}-{match['awayTeam']['score']}
@@ -165,11 +165,17 @@ class ProbablTest extends Component {
 			matchMisc = <Text>Upcoming match</Text>
 		}
 
+		matchDate = match['@date'].split('/');
+		matchDate = new Date(
+			matchDate[2],
+			parseInt(matchDate[1]) - 1,
+			matchDate[0]
+		);
 		return (
 			<View style={styles.paddedContent}>
 				<View style={styles.container}>
 					<View style={styles.half}>
-						<Text>{match['@date']}</Text>
+						<Text>{matchDate.toDateString()}</Text>
 					</View>
 					<View style={styles.half}>
 						{matchMisc}
