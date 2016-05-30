@@ -6,7 +6,6 @@
 import React, { Component } from 'react';
 import {
 	AppRegistry,
-	StyleSheet,
 	ListView,
 	Text,
 	DatePickerAndroid,
@@ -14,6 +13,18 @@ import {
 	View
 } from 'react-native';
 
+var styles = require('./styles.js');
+
+//views
+var views = {
+	match: require('./views/match.view.js'),
+	matchList: require('./views/matchList.view.js'),
+	noMatch: require('./views/noMatch.view.js'),
+	matchScore: require('./views/matchScore.view.js'),
+	loading: require('./views/loading.view.js'),
+	main: require('./views/main.view.js'),
+	error: require('./views/error.view.js')
+};
 
 var REQUEST_URL = 'http://pads6.pa-sport.com/api/football/competitions/matchDay/{{API_KEY}}/{{DATE}}/json';
 
@@ -88,20 +99,17 @@ class ProbablTest extends Component {
 
 	render() {
 		if (this.state.error) {
-			return this.renderError(this.state.error);
+			return views.error(this.state.error);
 		}
 		else if (!this.state.loaded) {
-			return this.renderLoadingView();
+			return views.loading();
 		}
 
-		var results, date, nbMatches,
+		var results, nbMatches, date,
 			text = 'matches found';
 
-		date = this.state.date.toDateString();
 		if (this.state.empty) {
-			results = <View style={styles.container}>
-				<Text>No match found</Text>
-			</View>;
+			results = views.noMatch();
 		}
 		else {
 			nbMatches = this.state.dataSource._dataBlob.s1.length;
@@ -110,49 +118,19 @@ class ProbablTest extends Component {
 				text = 'match found';
 			}
 
-			results = <View>
-				<View style={[styles.paddedContent, styles.center]}>
-					<Text>{nbMatches} {text}</Text>
-				</View>
-				<ListView
-					dataSource={this.state.dataSource}
-					renderRow={this.renderMatch.bind(this)}
-					style={styles.listView}
-				/>
-			</View>;
+			results = views.matchList(
+				nbMatches + ' ' + text,
+				this.state.dataSource,
+				this.renderMatch.bind(this)
+			);
 		}
 
-		return (
-			<View>
-				<View style={styles.paddedContent}>
-					<TouchableWithoutFeedback
-						onPress={this.showPicker.bind(this)}
-					>
-						<View>
-							<Text>{date}</Text>
-						</View>
-					</TouchableWithoutFeedback>
-				</View>
-				{results}
-			</View>
+		return views.main(
+			this.state.date.toDateString(),
+			this.showPicker.bind(this),
+			results
 		);
 	}
-
-	renderLoadingView() {
-		return (
-			<View style={styles.container}>
-				<Text>
-					Loading matches...
-				</Text>
-			</View>
-		);
-	}
-
-	renderError(error) {
-		return (<View style={styles.container}>
-			<Text>{error}</Text>
-		</View>);
-	};
 
 	getWinnerLoser(matchFinished, homeTeam, awayTeam) {
 		if (!matchFinished || homeTeam.score === awayTeam.score) {
@@ -166,90 +144,36 @@ class ProbablTest extends Component {
 		}
 	}
 
-	renderMatch(match) {
-		var matchResult, matchMisc, matchDate,
-			matchFinished = false, resultTeams;
-		if (match['matchStatus'] === 'FT' || match['matchStatus'] === 'KO') {
-			matchResult = <Text>
-				{match['homeTeam']['score']}-{match['awayTeam']['score']}
-			</Text>;
-
-			matchFinished = (match['matchStatus'] === 'FT');
-		}
-		else {
-			matchMisc = <Text>Upcoming match</Text>
-		}
-
-		matchDate = match['@date'].split('/');
-		matchDate = new Date(
-			matchDate[2],
-			parseInt(matchDate[1]) - 1,
-			matchDate[0]
+	formatMatch(match) {
+		match.date = match['@date'].split('/');
+		match.date = new Date(
+			match.date[2],
+			parseInt(match.date[1]) - 1,
+			match.date[0]
 		);
-
-		resultTeams = this.getWinnerLoser(
-			matchFinished,
+		match.resultTeams = this.getWinnerLoser(
+			(match['matchStatus'] === 'FT'),
 			match['homeTeam'],
 			match['awayTeam']
 		);
 
-		return (
-			<View style={styles.paddedContent}>
-				<View style={styles.container}>
-					<View style={styles.half}>
-						<Text>{matchDate.toDateString()}</Text>
-					</View>
-					<View style={styles.half}>
-						{matchMisc}
-					</View>
-				</View>
-				<View style={styles.container}>
-					<View style={styles.third}>
-						<Text style={resultTeams.homeTeam}>{match['homeTeam']['teamName']}</Text>
-					</View>
-					<View style={[styles.third, styles.center]}>
-						{matchResult}
-					</View>
-					<View style={styles.third}>
-						<Text style={resultTeams.awayTeam}>{match['awayTeam']['teamName']}</Text>
-					</View>
-				</View>
-			</View>
-		);
+		match.views = {};
+		if (match['matchStatus'] === 'FT'
+			|| match['matchStatus'] === 'KO'
+		) {
+			match.views.result = views.matchScore(match);
+		}
+		else {
+			match.views.misc = 'Upcoming match';
+		}
+
+		return match;
+	}
+
+	renderMatch(match) {
+		match = this.formatMatch(match);
+		return views.match(match);
 	}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#F5FCFF'
-	},
-	center: {
-		alignItems: 'center',
-		justifyContent: 'center'
-	},
-	listView: {
-		paddingTop: 20,
-		backgroundColor: '#F5FCFF'
-	},
-	paddedContent: {
-		padding: 7
-	},
-	third: {
-		flex: .333
-	},
-	half: {
-		flex: .5
-	},
-	winner: {
-		color: 'green'
-	},
-	loser: {
-		color: 'red'
-	}
-});
 
 AppRegistry.registerComponent('ProbablTest', () => ProbablTest);
