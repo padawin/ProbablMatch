@@ -116,7 +116,7 @@ class ProbablTest extends Component {
 				</View>
 				<ListView
 					dataSource={this.state.dataSource}
-					renderRow={this.renderMatch}
+					renderRow={this.renderMatch.bind(this)}
 					style={styles.listView}
 				/>
 			</View>;
