@@ -16,3 +16,8 @@
 
 ![screenshot1](screenshot1.png "Screenshot 1")
 ![screenshot2](screenshot2.png "Screenshot 2")
+
+## Improvements
+
+Add a "Add to favourite" feature so the user can save some matches, with
+a button to the list of favourite matches to access them quickly.
