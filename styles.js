@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 
 module.exports = StyleSheet.create({
 	container: {
@@ -30,5 +30,8 @@ module.exports = StyleSheet.create({
 	},
 	loser: {
 		color: 'red'
+	},
+	scrollView: {
+		height: Dimensions.get('window').height
 	}
 });;
